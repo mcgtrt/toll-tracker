@@ -1,5 +1,8 @@
 # toll-tracker
-Big data aggregation tool with microservices. Stack: Kafka, Prometheus, GRCP, Protobuffer, Grafana
+Big data aggregation tool with several microservices. Stack: Kafka, Prometheus, GRCP, Protobuffer, Grafana
+
+## Roadmap
+OBUs => Receiver => Kafka Queue
 
 # Installation guide
 ## Kafka docker
