@@ -14,9 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer dr.prod.CloseProducer()
 
-	fmt.Println("[RECEIVER] Starting the server")
+	fmt.Println("[RECEIVER] Starting server")
 	http.HandleFunc("/ws", dr.handleWS)
 	http.ListenAndServe(":3000", nil)
 }
@@ -26,14 +25,8 @@ type DataReceiver struct {
 	prod DataProducer
 }
 
-func NewDataReceiver() (*DataReceiver, error) {
-	prod, err := NewKafkaProducer()
-	if err != nil {
-		return nil, err
-	}
-	return &DataReceiver{
-		prod: prod,
-	}, nil
+func (dr *DataReceiver) produceData(data types.OBUData) error {
+	return dr.prod.ProduceData(data)
 }
 
 func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
@@ -47,20 +40,37 @@ func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
 	}
 	dr.conn = conn
 
-	go dr.wsReceiveLoop()
+	go dr.wsLoop()
 }
 
-func (dr *DataReceiver) wsReceiveLoop() {
-	fmt.Println("[RECEIVER] Started receiving channel")
+func (dr *DataReceiver) wsLoop() {
 	for {
 		var data types.OBUData
 		if err := dr.conn.ReadJSON(&data); err != nil {
 			log.Fatal(err)
 			continue
 		}
-		if err := dr.prod.ProduceData(data); err != nil {
-			fmt.Println("kafka produced an error:", err)
+		if err := dr.produceData(data); err != nil {
+			log.Fatal(err)
 		}
-		fmt.Println("[RECEIVER] Received ", data)
 	}
+}
+
+func NewDataReceiver() (*DataReceiver, error) {
+	var (
+		p          DataProducer
+		err        error
+		kafkaTopic = "obudata"
+	)
+
+	p, err = NewKafkaProducer(kafkaTopic)
+	if err != nil {
+		return nil, err
+	}
+
+	p = NewLogMiddleware(p)
+
+	return &DataReceiver{
+		prod: p,
+	}, nil
 }

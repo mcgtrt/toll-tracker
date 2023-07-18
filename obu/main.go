@@ -12,6 +12,8 @@ import (
 
 const wsEndpoint = "ws://127.0.0.1:3000/ws"
 
+var generateWaitTime = time.Second * 2
+
 // This service simulates sending real world OBUs(On Board Units) data
 // that will be later received by another service for processing
 func main() {
@@ -32,7 +34,7 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-		time.Sleep(time.Second * 2)
+		time.Sleep(generateWaitTime)
 	}
 }
 

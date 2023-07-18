@@ -8,15 +8,13 @@ import (
 	"github.com/mcgtrt/toll-tracker/types"
 )
 
-var kafkaTopic = "obudata"
-
 type DataProducer interface {
 	ProduceData(types.OBUData) error
-	CloseProducer()
 }
 
 type KafkaProducer struct {
 	producer *kafka.Producer
+	topic    string
 }
 
 func (p *KafkaProducer) ProduceData(data types.OBUData) error {
@@ -24,27 +22,21 @@ func (p *KafkaProducer) ProduceData(data types.OBUData) error {
 	if err != nil {
 		return err
 	}
-
 	return p.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
-			Topic:     &kafkaTopic,
+			Topic:     &p.topic,
 			Partition: kafka.PartitionAny,
 		},
 		Value: b,
 	}, nil)
 }
 
-func (p *KafkaProducer) CloseProducer() {
-	p.producer.Close()
-}
-
-func NewKafkaProducer() (*KafkaProducer, error) {
+func NewKafkaProducer(topic string) (DataProducer, error) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 	if err != nil {
 		return nil, err
 	}
 
-	// Start another go routine to check if we have delivered the data
 	go func() {
 		for e := range p.Events() {
 			switch ev := e.(type) {
@@ -60,5 +52,6 @@ func NewKafkaProducer() (*KafkaProducer, error) {
 
 	return &KafkaProducer{
 		producer: p,
+		topic:    topic,
 	}, nil
 }
