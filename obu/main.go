@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
@@ -33,6 +34,7 @@ func main() {
 			if err := conn.WriteJSON(data); err != nil {
 				log.Fatal(err)
 			}
+			fmt.Printf("OBUID [%d] :: <lat:%.2f, long: %.2f>\n", data.OBUID, data.Lat, data.Long)
 		}
 		time.Sleep(generateWaitTime)
 	}
