@@ -15,8 +15,8 @@ type CalcService struct {
 	previousData map[int][]float64
 }
 
-func NewCalcService() *CalcService {
-	return &CalcService{
+func NewCalcService() CalcServicer {
+	return CalcService{
 		distance:     make(map[int]float64),
 		previousData: make(map[int][]float64),
 	}

@@ -1,12 +1,23 @@
 package main
 
-import "log"
+import (
+	"log"
 
-const kafkaTopic = "obudata"
+	"github.com/mcgtrt/toll-tracker/aggregator/client"
+)
+
+const (
+	kafkaTopic          = "obudata"
+	aggregationEndpoint = "http://127.0.0.1:3000/aggregate"
+)
 
 func main() {
-	serv := NewCalcService()
-	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, serv)
+	var (
+		client = client.NewClient(aggregationEndpoint)
+		serv   = NewCalcService()
+	)
+	serv = NewLogMiddleware(serv)
+	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, serv, client)
 	if err != nil {
 		log.Fatal(err)
 	}

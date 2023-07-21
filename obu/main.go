@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"math/rand"
@@ -9,11 +8,12 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/mcgtrt/toll-tracker/types"
+	"github.com/sirupsen/logrus"
 )
 
-const wsEndpoint = "ws://127.0.0.1:3000/ws"
+const wsEndpoint = "ws://127.0.0.1:30000/ws"
 
-var generateWaitTime = time.Second * 2
+var generateWaitTime = time.Second * 5
 
 // This service simulates sending real world OBUs(On Board Units) data
 // that will be later received by another service for processing
@@ -34,7 +34,11 @@ func main() {
 			if err := conn.WriteJSON(data); err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("OBUID [%d] :: <lat:%.2f, long: %.2f>\n", data.OBUID, data.Lat, data.Long)
+			logrus.WithFields(logrus.Fields{
+				"id":   data.OBUID,
+				"lat":  data.Lat,
+				"long": data.Long,
+			}).Info("Generating Random OBU Data")
 		}
 		time.Sleep(generateWaitTime)
 	}

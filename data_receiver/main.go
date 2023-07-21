@@ -17,7 +17,7 @@ func main() {
 
 	fmt.Println("[RECEIVER] Starting server")
 	http.HandleFunc("/ws", dr.handleWS)
-	http.ListenAndServe(":3000", nil)
+	log.Fatal(http.ListenAndServe(":30000", nil))
 }
 
 type DataReceiver struct {
