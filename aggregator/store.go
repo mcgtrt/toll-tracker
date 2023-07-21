@@ -1,8 +1,13 @@
 package main
 
-import "github.com/mcgtrt/toll-tracker/types"
+import (
+	"fmt"
+
+	"github.com/mcgtrt/toll-tracker/types"
+)
 
 type Storer interface {
+	GetDistanceByOBUID(int) (float64, error)
 	Insert(types.Distance) error
 }
 
@@ -14,6 +19,14 @@ func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
 		data: make(map[int]float64),
 	}
+}
+
+func (s *MemoryStore) GetDistanceByOBUID(id int) (float64, error) {
+	dist, ok := s.data[id]
+	if !ok {
+		return 0, fmt.Errorf("invalid obuid [%d]", id)
+	}
+	return dist, nil
 }
 
 func (s *MemoryStore) Insert(dist types.Distance) error {

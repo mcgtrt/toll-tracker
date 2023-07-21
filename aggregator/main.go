@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/mcgtrt/toll-tracker/types"
 )
@@ -24,7 +25,29 @@ func main() {
 func makeHTTPTransport(listenAddr string, service Aggregator) {
 	fmt.Printf("HTTP Transport running on port %s\n", listenAddr)
 	http.HandleFunc("/aggregate", handleAggregate(service))
+	http.HandleFunc("/invoice", handleInvoice(service))
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
+}
+
+func handleInvoice(service Aggregator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		values, ok := r.URL.Query()["obu"]
+		if !ok {
+			writeJSON(w, http.StatusBadRequest, errJSON(fmt.Errorf("obu not provided")))
+			return
+		}
+		obuid, err := strconv.Atoi(values[0])
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, errJSON(err))
+			return
+		}
+		inv, err := service.CalculateInvoice(obuid)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, errJSON(err))
+			return
+		}
+		writeJSON(w, http.StatusOK, inv)
+	}
 }
 
 func handleAggregate(service Aggregator) http.HandlerFunc {
@@ -42,8 +65,8 @@ func handleAggregate(service Aggregator) http.HandlerFunc {
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
 
