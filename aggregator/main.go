@@ -22,27 +22,29 @@ func main() {
 	)
 	flag.Parse()
 	service = NewLogMiddleware(service)
-	go makeGRPCTransport(*grpcListenAddr, service)
-	makeHTTPTransport(*httpListenAddr, service)
+	go func() {
+		log.Fatal(makeGRPCTransport(*grpcListenAddr, service))
+	}()
+	log.Fatal(makeHTTPTransport(*httpListenAddr, service))
 }
 
 func makeGRPCTransport(listenAddr string, srv Aggregator) error {
-	ln, err := net.Listen("TCP", listenAddr)
+	ln, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		return err
 	}
-	defer ln.Close()
 
 	server := grpc.NewServer([]grpc.ServerOption{}...)
 	types.RegisterAggregatorServer(server, NewGRPCServer(srv))
+	fmt.Printf("GRPC Transport running on port %s\n", listenAddr)
 	return server.Serve(ln)
 }
 
-func makeHTTPTransport(listenAddr string, service Aggregator) {
-	fmt.Printf("HTTP Transport running on port %s\n", listenAddr)
+func makeHTTPTransport(listenAddr string, service Aggregator) error {
 	http.HandleFunc("/aggregate", handleAggregate(service))
 	http.HandleFunc("/invoice", handleInvoice(service))
-	log.Fatal(http.ListenAndServe(listenAddr, nil))
+	fmt.Printf("HTTP Transport running on port %s\n", listenAddr)
+	return http.ListenAndServe(listenAddr, nil)
 }
 
 func handleInvoice(service Aggregator) http.HandlerFunc {
