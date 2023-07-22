@@ -5,21 +5,37 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"strconv"
 
 	"github.com/mcgtrt/toll-tracker/types"
+	"google.golang.org/grpc"
 )
 
 func main() {
 	var (
-		listenAddr = flag.String("listenAddr", ":3000", "listen address for aggregator HTTP server")
-		store      = NewMemoryStore()
-		service    = NewInvoiceAggregator(store)
+		httpListenAddr = flag.String("httpAddr", ":3000", "listen address for aggregator HTTP server")
+		grpcListenAddr = flag.String("grcpAddr", ":3001", "listen address for aggregator HTTP server")
+		store          = NewMemoryStore()
+		service        = NewInvoiceAggregator(store)
 	)
 	flag.Parse()
 	service = NewLogMiddleware(service)
-	makeHTTPTransport(*listenAddr, service)
+	go makeGRPCTransport(*grpcListenAddr, service)
+	makeHTTPTransport(*httpListenAddr, service)
+}
+
+func makeGRPCTransport(listenAddr string, srv Aggregator) error {
+	ln, err := net.Listen("TCP", listenAddr)
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
+
+	server := grpc.NewServer([]grpc.ServerOption{}...)
+	types.RegisterAggregatorServer(server, NewGRPCServer(srv))
+	return server.Serve(ln)
 }
 
 func makeHTTPTransport(listenAddr string, service Aggregator) {

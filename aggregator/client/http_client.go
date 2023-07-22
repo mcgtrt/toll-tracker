@@ -13,7 +13,7 @@ type Client struct {
 	Endpoint string
 }
 
-func NewClient(endpoint string) *Client {
+func NewHTTPClient(endpoint string) *Client {
 	return &Client{
 		Endpoint: endpoint,
 	}

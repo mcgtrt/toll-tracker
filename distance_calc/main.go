@@ -13,7 +13,7 @@ const (
 
 func main() {
 	var (
-		client = client.NewClient(aggregationEndpoint)
+		client = client.NewHTTPClient(aggregationEndpoint)
 		serv   = NewCalcService()
 	)
 	serv = NewLogMiddleware(serv)
