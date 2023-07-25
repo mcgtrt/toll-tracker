@@ -33,6 +33,10 @@ func makeGRPCTransport(listenAddr string, srv Aggregator) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		fmt.Println("Closing gRPC server")
+		ln.Close()
+	}()
 
 	server := grpc.NewServer([]grpc.ServerOption{}...)
 	types.RegisterAggregatorServer(server, NewGRPCServer(srv))

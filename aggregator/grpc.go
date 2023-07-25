@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/mcgtrt/toll-tracker/types"
 )
 
@@ -15,11 +17,11 @@ func NewGRPCServer(service Aggregator) *GRPCServer {
 	}
 }
 
-func (s *GRPCServer) AggregateDistance(req *types.AggregateRequest) error {
+func (s *GRPCServer) Aggregate(ctx context.Context, req *types.AggregateRequest) (*types.None, error) {
 	dist := types.Distance{
 		OBUID: int(req.OBUID),
 		Value: req.Value,
 		Unix:  req.Unix,
 	}
-	return s.service.AggregateDistance(dist)
+	return &types.None{}, s.service.AggregateDistance(dist)
 }

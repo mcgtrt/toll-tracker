@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -19,16 +20,16 @@ func NewHTTPClient(endpoint string) *HTTPClient {
 	}
 }
 
-func (c *HTTPClient) AggregateInvoice(dist types.Distance) error {
-	b, err := json.Marshal(dist)
+func (c *HTTPClient) Aggregate(ctx context.Context, request *types.AggregateRequest) error {
+	b, err := json.Marshal(request)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(b))
+	httpReq, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
 		return err
 	}
