@@ -17,6 +17,8 @@ func NewGRPCServer(service Aggregator) *GRPCServer {
 	}
 }
 
+// This protoc method returns *types.None as in this example we're not listening for any return,
+// only if aggregation was successful
 func (s *GRPCServer) Aggregate(ctx context.Context, req *types.AggregateRequest) (*types.None, error) {
 	dist := types.Distance{
 		OBUID: int(req.OBUID),

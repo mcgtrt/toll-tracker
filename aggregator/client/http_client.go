@@ -20,21 +20,21 @@ func NewHTTPClient(endpoint string) *HTTPClient {
 	}
 }
 
-func (c *HTTPClient) Aggregate(ctx context.Context, request *types.AggregateRequest) error {
-	b, err := json.Marshal(request)
+func (c *HTTPClient) Aggregate(ctx context.Context, req *types.AggregateRequest) (*types.None, error) {
+	b, err := json.Marshal(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	httpReq, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(b))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("the server responded with %d status code", resp.StatusCode)
+		return nil, fmt.Errorf("the server responded with %d status code", resp.StatusCode)
 	}
-	return nil
+	return &types.None{}, nil
 }

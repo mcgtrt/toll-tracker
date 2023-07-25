@@ -12,12 +12,13 @@ const (
 )
 
 func main() {
-	var (
-		client = client.NewHTTPClient(aggregationEndpoint)
-		serv   = NewCalcService()
-	)
+	serv := NewCalcService()
 	serv = NewLogMiddleware(serv)
-	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, serv, client)
+	grpcClient, err := client.NewGRPCClient(aggregationEndpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, serv, grpcClient)
 	if err != nil {
 		log.Fatal(err)
 	}
