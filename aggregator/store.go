@@ -36,6 +36,5 @@ func (s *MemoryStore) GetDistanceByOBUID(id int) (float64, error) {
 
 func (s *MemoryStore) Insert(dist types.Distance) error {
 	s.data[dist.OBUID] += dist.Value
-	fmt.Printf("Inserting ID: %d\nNew distance: %.2f\n", dist.OBUID, s.data[dist.OBUID])
 	return nil
 }

@@ -57,7 +57,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 		}
 		calculatedDist := c.calcService.CalculateDistance(data)
 		dist := &types.AggregateRequest{
-			OBUID: int32(data.OBUID),
+			OBUID: int64(data.OBUID),
 			Value: calculatedDist,
 			Unix:  time.Now().UnixNano(),
 		}
