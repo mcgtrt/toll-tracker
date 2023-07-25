@@ -7,14 +7,16 @@ import (
 )
 
 const (
-	kafkaTopic          = "obudata"
-	aggregationEndpoint = "http://127.0.0.1:3000/aggregate"
+	kafkaTopic     = "obudata"
+	httpListenAddr = ":3000"
+	grpcListenAddr = ":3001"
 )
 
 func main() {
 	serv := NewCalcService()
 	serv = NewLogMiddleware(serv)
-	grpcClient, err := client.NewGRPCClient(aggregationEndpoint)
+	// httpClient := client.NewHTTPClient(httpListenAddr)
+	grpcClient, err := client.NewGRPCClient(grpcListenAddr)
 	if err != nil {
 		log.Fatal(err)
 	}

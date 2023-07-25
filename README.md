@@ -21,12 +21,12 @@ coordinates. Then uses the (5. Aggregator)'s Client to store it and process via 
 
 5. Aggregator => CRUD operations for OBU Distance, invoicer, and data provider for the Gateway.
 
-6. Gateway =>
+6. Gateway => User facing API
 
 ## NOTE
 This is a demo of how to structure, connect, and build transport between microservices.
 
-It may not include the full business logic or data storage to aggregate distance.
+It may not include the full business logic, endpoint implementation or data storage to aggregate distance.
 
 All operations are handled in memory to prove the concept and make the application work properly.
 

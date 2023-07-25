@@ -59,11 +59,13 @@ func handleInvoice(service Aggregator) http.HandlerFunc {
 			return
 		}
 		obuid, err := strconv.Atoi(values[0])
+		fmt.Printf("OBUID: %d\n", obuid)
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, errJSON(err))
 			return
 		}
 		inv, err := service.CalculateInvoice(obuid)
+		fmt.Printf("INV: %v, ERR: %v", inv, err)
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, errJSON(err))
 			return

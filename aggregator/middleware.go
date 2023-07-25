@@ -43,6 +43,7 @@ func (m *LogMiddleware) AggregateDistance(dist types.Distance) (err error) {
 	defer func(start time.Time) {
 		logrus.WithFields(logrus.Fields{
 			"took": time.Since(start),
+			"id":   dist.OBUID,
 			"dist": dist,
 			"err":  err,
 		}).Info("AggregateDistance")
