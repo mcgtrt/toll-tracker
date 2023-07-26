@@ -90,3 +90,8 @@ docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus
 ```
 go get github.com/prometheus/client_golang/prometheus
 ```
+
+## Grafana
+```
+docker run -d -p 3000:3000 --name=grafana grafana/grafana-enterprise
+```

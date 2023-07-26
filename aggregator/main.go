@@ -16,7 +16,7 @@ import (
 
 func main() {
 	var (
-		httpListenAddr = flag.String("httpAddr", ":3000", "listen address for aggregator HTTP server")
+		httpListenAddr = flag.String("httpAddr", ":4000", "listen address for aggregator HTTP server")
 		grpcListenAddr = flag.String("grcpAddr", ":3001", "listen address for aggregator HTTP server")
 		store          = NewMemoryStore()
 		service        = NewInvoiceAggregator(store)
