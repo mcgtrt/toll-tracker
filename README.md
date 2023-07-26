@@ -21,7 +21,7 @@ coordinates. Then uses the (5. Aggregator)'s Client to store it and process via 
 
 5. Aggregator => CRUD operations for OBU Distance, invoicer, and data provider for the Gateway.
 
-5. 1. Prometheus implementation will only be present as the middleware for aggregator interface methods
+5.1. Prometheus implementation will only be present as the middleware for aggregator interface methods
 
 6. Gateway => User facing API, communicating with Aggregator API
 
@@ -72,12 +72,12 @@ PATH="${PATH}:${HOME}/go/bin"
 ```
 
 4. Install the package dependencies
-4. 1. Protobuffer package
+4.1. Protobuffer package
 ```
 go get google.golang.org/protobuf
 ```
 
-4. 2. gRPC Package
+4.2. gRPC Package
 ```
 go get google.golang.org/grpc/
 ```
