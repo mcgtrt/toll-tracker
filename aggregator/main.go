@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/mcgtrt/toll-tracker/types"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
@@ -21,7 +22,10 @@ func main() {
 		service        = NewInvoiceAggregator(store)
 	)
 	flag.Parse()
+
+	service = NewMetricsMiddleware(service)
 	service = NewLogMiddleware(service)
+
 	go func() {
 		log.Fatal(makeGRPCTransport(*grpcListenAddr, service))
 	}()
@@ -47,6 +51,7 @@ func makeGRPCTransport(listenAddr string, srv Aggregator) error {
 func makeHTTPTransport(listenAddr string, service Aggregator) error {
 	http.HandleFunc("/aggregate", handleAggregate(service))
 	http.HandleFunc("/invoice", handleInvoice(service))
+	http.Handle("/metrics", promhttp.Handler())
 	fmt.Printf("HTTP Transport running on port %s\n", listenAddr)
 	return http.ListenAndServe(listenAddr, nil)
 }

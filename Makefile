@@ -24,4 +24,7 @@ proto:
 temp:
 	@go run temp/main.go
 
+prometheus:
+	@./../prometheus/prometheus --config.file=.config/prometheus.yml
+
 .PHONY: obu receiver temp

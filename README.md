@@ -21,16 +21,16 @@ coordinates. Then uses the (5. Aggregator)'s Client to store it and process via 
 
 5. Aggregator => CRUD operations for OBU Distance, invoicer, and data provider for the Gateway.
 
-6. Gateway => User facing API
+6. Gateway => User facing API, communicating with Aggregator API
 
 ## NOTE
 This is a demo of how to structure, connect, and build transport between microservices.
 
-It may not include the full business logic, endpoint implementation or data storage to aggregate distance.
+It may not include the full business logic, all endpoints or data storage (like NoSQL).
 
 All operations are handled in memory to prove the concept and make the application work properly.
 
-Consider having a browse from my other projects to see the full implementation.
+For business logic, check out Hotel API, Crypto, or other projects.
 
 # Installation guide
 ## Kafka docker
@@ -70,11 +70,23 @@ PATH="${PATH}:${HOME}/go/bin"
 ```
 
 4. Install the package dependencies
-4.1 protobuffer package
+4. 1. Protobuffer package
 ```
 go get google.golang.org/protobuf
 ```
-4.2 grpc package
+
+4. 2. gRPC Package
 ```
 go get google.golang.org/grpc/
+```
+
+## Prometheus
+1. Install Prometheus (Docker)
+```
+docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus
+```
+
+2. Install prometheus client
+```
+go get github.com/prometheus/client_golang/prometheus
 ```
