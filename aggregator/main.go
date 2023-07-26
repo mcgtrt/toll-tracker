@@ -51,12 +51,14 @@ func makeHTTPTransport(listenAddr string, service Aggregator) error {
 	var (
 		aggMetricHandler = newHTTPMetricHandler("aggregate")
 		invMetricHandler = newHTTPMetricHandler("invoice")
+		aggHandlerFunc   = makeHTTPHandlerFunc(aggMetricHandler.instrument(handleAggregate(service)))
+		invHandleFunc    = makeHTTPHandlerFunc(invMetricHandler.instrument(handleInvoice(service)))
 	)
 
 	logrus.Infof("HTTP Transport running on port %s\n", listenAddr)
 
-	http.HandleFunc("/aggregate", aggMetricHandler.instrument(handleAggregate(service)))
-	http.HandleFunc("/invoice", invMetricHandler.instrument(handleInvoice(service)))
+	http.HandleFunc("/aggregate", aggHandlerFunc)
+	http.HandleFunc("/invoice", invHandleFunc)
 	http.Handle("/metrics", promhttp.Handler())
 
 	return http.ListenAndServe(listenAddr, nil)

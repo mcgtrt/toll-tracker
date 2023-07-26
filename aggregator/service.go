@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/mcgtrt/toll-tracker/types"
 )
 
@@ -33,7 +31,6 @@ func (a InvoiceAggregator) CalculateInvoice(id int) (*types.Invoice, error) {
 		TotalDistance: dist,
 		Amount:        basePrice * dist,
 	}
-	fmt.Println(inv)
 	return inv, nil
 }
 
