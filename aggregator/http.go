@@ -136,7 +136,7 @@ func handleAggregate(service Aggregator) HTTPFunc {
 				Err:  err.Error(),
 			}
 		}
-		return nil
+		return writeJSON(w, http.StatusOK, map[string]string{"aggregate": "ok"})
 	}
 }
 
