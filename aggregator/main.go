@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 
+	"github.com/joho/godotenv"
 	"github.com/mcgtrt/toll-tracker/types"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
@@ -16,20 +17,19 @@ import (
 
 func main() {
 	var (
-		httpListenAddr = flag.String("httpAddr", ":4000", "listen address for aggregator HTTP server")
-		grpcListenAddr = flag.String("grcpAddr", ":3001", "listen address for aggregator HTTP server")
+		httpListenAddr = os.Getenv("AGG_HTTP_ENDPOINT")
+		grpcListenAddr = os.Getenv("AGG_GRPC_ENDPOINT")
 		store          = NewMemoryStore()
 		service        = NewInvoiceAggregator(store)
 	)
-	flag.Parse()
 
 	service = NewMetricsMiddleware(service)
 	service = NewLogMiddleware(service)
 
 	go func() {
-		log.Fatal(makeGRPCTransport(*grpcListenAddr, service))
+		log.Fatal(makeGRPCTransport(grpcListenAddr, service))
 	}()
-	log.Fatal(makeHTTPTransport(*httpListenAddr, service))
+	log.Fatal(makeHTTPTransport(httpListenAddr, service))
 }
 
 func makeGRPCTransport(listenAddr string, srv Aggregator) error {
@@ -101,4 +101,10 @@ func writeJSON(w http.ResponseWriter, status int, v any) error {
 
 func errJSON(err error) map[string]string {
 	return map[string]string{"err": err.Error()}
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 }

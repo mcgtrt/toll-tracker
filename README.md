@@ -21,6 +21,8 @@ coordinates. Then uses the (5. Aggregator)'s Client to store it and process via 
 
 5. Aggregator => CRUD operations for OBU Distance, invoicer, and data provider for the Gateway.
 
+5. 1. Prometheus implementation will only be present as the middleware for aggregator interface methods
+
 6. Gateway => User facing API, communicating with Aggregator API
 
 ## NOTE

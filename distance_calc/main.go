@@ -2,20 +2,20 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/mcgtrt/toll-tracker/aggregator/client"
 )
 
-const (
-	kafkaTopic     = "obudata"
-	httpListenAddr = ":3000"
-	grpcListenAddr = ":3001"
-)
+const kafkaTopic = "obudata"
 
 func main() {
-	serv := NewCalcService()
+	var (
+		serv           = NewCalcService()
+		grpcListenAddr = os.Getenv("AGG_GRPC_ENDPOINT")
+	)
 	serv = NewLogMiddleware(serv)
-	// httpClient := client.NewHTTPClient(httpListenAddr)
 	grpcClient, err := client.NewGRPCClient(grpcListenAddr)
 	if err != nil {
 		log.Fatal(err)
@@ -25,4 +25,10 @@ func main() {
 		log.Fatal(err)
 	}
 	kafkaConsumer.Start()
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 }

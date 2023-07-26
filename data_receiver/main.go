@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 	"github.com/mcgtrt/toll-tracker/types"
 )
 
@@ -17,7 +19,7 @@ func main() {
 
 	fmt.Println("[RECEIVER] Starting server")
 	http.HandleFunc("/ws", dr.handleWS)
-	log.Fatal(http.ListenAndServe(":30000", nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("RECEIVER_PRODUCER_ENDPOINT"), nil))
 }
 
 type DataReceiver struct {
@@ -73,4 +75,10 @@ func NewDataReceiver() (*DataReceiver, error) {
 	return &DataReceiver{
 		prod: p,
 	}, nil
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 }

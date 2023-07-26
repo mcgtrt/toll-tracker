@@ -1,19 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 	"github.com/mcgtrt/toll-tracker/types"
 	"github.com/sirupsen/logrus"
 )
 
-const wsEndpoint = "ws://127.0.0.1:30000/ws"
-
-var generateWaitTime = time.Second * 5
+var (
+	generateWaitTime = time.Second * 5
+	wsEndpoint       = fmt.Sprintf("ws://127.0.0.1%s/ws", os.Getenv("RECEIVER_PRODUCER_ENDPOINT"))
+)
 
 // This service simulates sending real world OBUs(On Board Units) data
 // that will be later received by another service for processing
@@ -44,10 +48,6 @@ func main() {
 	}
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 func generateLatLong() (float64, float64) {
 	return generateCoord(), generateCoord()
 }
@@ -64,4 +64,11 @@ func generateOBUIDs(n int) []int {
 		ids[i] = rand.Intn(math.MaxInt)
 	}
 	return ids
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 }

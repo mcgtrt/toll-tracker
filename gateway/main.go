@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
+	"github.com/joho/godotenv"
 	"github.com/mcgtrt/toll-tracker/aggregator/client"
 	"github.com/sirupsen/logrus"
 )
@@ -16,18 +17,16 @@ import (
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":6000", "listen address of the gateway HTTP server")
-	flag.Parse()
-
 	var (
-		httpCLientEndpoint = "http://127.0.0.1:3000"
-		client             = client.NewHTTPClient(httpCLientEndpoint)
-		invoiceHandler     = newInvoiceHandler(client)
+		aggHTTPEndpoint  = "http://127.0.0.1" + os.Getenv("AGG_HTTP_ENDPOINT")
+		gateHTTPEndpoint = os.Getenv("GATE_HTTP_ENDPOINT")
+		client           = client.NewHTTPClient(aggHTTPEndpoint)
+		invoiceHandler   = newInvoiceHandler(client)
 	)
 
 	http.HandleFunc("/invoice", makeApiFunc(invoiceHandler.HandleGetInvoice))
-	logrus.Infof("Starting HTTP server on port %s", *listenAddr)
-	log.Fatal(http.ListenAndServe(*listenAddr, nil))
+	logrus.Infof("Starting HTTP server on port %s", gateHTTPEndpoint)
+	log.Fatal(http.ListenAndServe(gateHTTPEndpoint, nil))
 }
 
 type InvoiceHandler struct {
@@ -70,5 +69,11 @@ func makeApiFunc(fn apiFunc) http.HandlerFunc {
 		if err := fn(w, r); err != nil {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"err": err.Error()})
 		}
+	}
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
 	}
 }
