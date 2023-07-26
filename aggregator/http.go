@@ -26,8 +26,8 @@ func newHTTPMetricHandler(reqName string) *HTTPMetricHandler {
 }
 
 func (h *HTTPMetricHandler) instrument(next http.HandlerFunc) http.HandlerFunc {
-	h.reqCounter.Inc()
 	return func(w http.ResponseWriter, r *http.Request) {
+		h.reqCounter.Inc()
 		next(w, r)
 	}
 }
