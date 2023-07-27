@@ -6,10 +6,14 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-kit/kit/metrics"
+	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/log"
 	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggendpoint"
 	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggservice"
 	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggtransport"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -29,9 +33,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	var duration metrics.Histogram
+	{
+		// Endpoint-level metrics.
+		duration = prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+			Namespace: "aggregate",
+			Subsystem: "aggsvc",
+			Name:      "request_duration_seconds",
+			Help:      "Request duration in seconds.",
+		}, []string{"method", "success"})
+	}
+	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
+
 	var (
-		svc         = aggservice.New()
-		endpoints   = aggendpoint.New(svc, logger)
+		svc         = aggservice.New(logger)
+		endpoints   = aggendpoint.New(svc, duration, logger)
 		httpHandler = aggtransport.NewHTTPHandler(endpoints, logger)
 	)
 

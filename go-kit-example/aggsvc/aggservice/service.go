@@ -3,6 +3,7 @@ package aggservice
 import (
 	"context"
 
+	"github.com/go-kit/log"
 	"github.com/mcgtrt/toll-tracker/types"
 )
 
@@ -13,13 +14,12 @@ type Service interface {
 	Calculate(context.Context, int) (*types.Invoice, error)
 }
 
-func New() Service {
-
+func New(logger log.Logger) Service {
 	var service Service
 	{
 		service = newBasicService(NewMemoryStore())
-		service = newLoggingMiddleware()(service)
-		service = newinstrumentationMiddleware()(service)
+		service = newLoggingMiddleware(logger)(service)
+		service = newinstrumentationMiddleware(logger)(service)
 	}
 
 	return service

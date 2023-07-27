@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/ratelimit"
 	"github.com/go-kit/log"
 	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggservice"
@@ -19,20 +20,22 @@ type Set struct {
 	CalculateEndpoint endpoint.Endpoint
 }
 
-func New(svc aggservice.Service, logger log.Logger) Set {
+func New(svc aggservice.Service, duration metrics.Histogram, logger log.Logger) Set {
 	var aggregateEndpoint endpoint.Endpoint
 	{
 		aggregateEndpoint = MakeAggregateEndpoint(svc)
 		aggregateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 1))(aggregateEndpoint)
 		aggregateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(aggregateEndpoint)
+		aggregateEndpoint = LoggingMiddleware(log.With(logger, "method", "aggregate"))(aggregateEndpoint)
+		aggregateEndpoint = InstrumentingMiddleware(duration.With("method", "/aggregate"))(aggregateEndpoint)
 	}
 	var calculateEndpoint endpoint.Endpoint
 	{
 		calculateEndpoint = MakeCalculateEndpoint(svc)
-		// Concat is limited to 1 request per second with burst of 100 requests.
-		// Note, rate is defined as a number of requests per second.
 		calculateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Limit(1), 100))(calculateEndpoint)
 		calculateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(calculateEndpoint)
+		calculateEndpoint = LoggingMiddleware(log.With(logger, "method", "calculate"))(calculateEndpoint)
+		calculateEndpoint = InstrumentingMiddleware(duration.With("method", "/invoice"))(calculateEndpoint)
 	}
 	return Set{
 		AggregateEndpoint: aggregateEndpoint,

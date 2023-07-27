@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -150,7 +149,7 @@ func encodeHTTPGenericResponse(ctx context.Context, w http.ResponseWriter, respo
 }
 
 func errorEncoder(_ context.Context, err error, w http.ResponseWriter) {
-	fmt.Println("This is comming from errorEncoder => ", err)
+	json.NewEncoder(w).Encode(map[string]string{"err": err.Error()})
 }
 
 func copyURL(base *url.URL, path string) *url.URL {
