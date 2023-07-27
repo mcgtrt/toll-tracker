@@ -13,6 +13,18 @@ type Service interface {
 	Calculate(context.Context, int) (*types.Invoice, error)
 }
 
+func New() Service {
+
+	var service Service
+	{
+		service = newBasicService(NewMemoryStore())
+		service = newLoggingMiddleware()(service)
+		service = newinstrumentationMiddleware()(service)
+	}
+
+	return service
+}
+
 type BasicService struct {
 	store Storer
 }

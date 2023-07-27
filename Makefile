@@ -27,4 +27,7 @@ temp:
 prometheus:
 	@./../prometheus/prometheus --config.file=.config/prometheus.yml
 
+gokit:
+	@go run go-kit-example/aggsvc/cmd/main.go
+
 .PHONY: obu receiver temp

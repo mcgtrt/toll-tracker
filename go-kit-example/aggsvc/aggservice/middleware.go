@@ -8,18 +8,6 @@ import (
 
 type Middleware func(Service) Service
 
-func New() Service {
-
-	var service Service
-	{
-		service = newBasicService(NewMemoryStore())
-		service = newLoggingMiddleware()(service)
-		service = newinstrumentationMiddleware()(service)
-	}
-
-	return service
-}
-
 type loggingMiddleware struct {
 	next Service
 }

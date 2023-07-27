@@ -18,8 +18,8 @@ import (
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/go-kit/log"
-	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsrv/aggendpoint"
-	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsrv/aggservice"
+	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggendpoint"
+	"github.com/mcgtrt/toll-tracker/go-kit-example/aggsvc/aggservice"
 	"github.com/sony/gobreaker"
 	"golang.org/x/time/rate"
 )
