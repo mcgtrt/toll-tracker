@@ -2,13 +2,13 @@
 OBU Tracker with data aggregation and gateway back-end service.
 
 ## Stack: 
-Kafka, GRPC, Protobuffers, Prometheus, Grafana, Microservices
+Microservices, Kafka, Prometheus, Grafana
 
 ## Transport between microservices:
-- HTTP(JSON API) - native http, net servers and listeners, no fancy packages.
-- TCP(gRPC & Protobuffers)
+- HTTP(JSON API) - native http & net servers and listeners, no fancy packages.
+- GRPC with Protobuffers
 
-## Roadmap
+## Microservices structure
 1. OBUs (On-Board Units) => Generate OBUID with coordinates and sends them to data_receiver
 
 2. Receiver/Producer (data_receiver) => Awaits for OBU Data and produces to Kafka
@@ -25,16 +25,21 @@ coordinates. Then uses the (5. Aggregator)'s Client to store it and process via 
 
 6. Gateway => User facing API, communicating with Aggregator API
 
+## Bonus
+Enterprise-standard implementation of the Aggregator service
+(go-kit-example/aggsvc)
+
 ## NOTE
-This is a demo of how to structure, connect, and build transport between microservices.
+This is a project demonstrating how to structure, connect, and build transport between microservices.
 
 It may not include the full business logic, all endpoints or data storage (like NoSQL).
 
 All operations are handled in memory to prove the concept and make the application work properly.
 
-For business logic, check out Hotel API, Crypto, or other projects.
+For business logic implementation, check out the Hotel API or other projects.
 
-# Installation guide
+
+# Project setup and installation guide
 ## Kafka docker
 ```
 docker run --name kafka -p 9092:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true bitnami/kafka:latest 
@@ -72,12 +77,12 @@ PATH="${PATH}:${HOME}/go/bin"
 ```
 
 4. Install the package dependencies
-4.1. Protobuffer package
+- Protobuffer package
 ```
 go get google.golang.org/protobuf
 ```
 
-4.2. gRPC Package
+- gRPC Package
 ```
 go get google.golang.org/grpc/
 ```

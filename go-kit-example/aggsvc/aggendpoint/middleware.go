@@ -19,9 +19,7 @@ func LoggingMiddleware(logger log.Logger) endpoint.Middleware {
 					"took", time.Since(start),
 				)
 			}(time.Now())
-
 			return next(ctx, request)
-
 		}
 	}
 }
@@ -33,9 +31,7 @@ func InstrumentingMiddleware(duration metrics.Histogram) endpoint.Middleware {
 			defer func(start time.Time) {
 				duration.With("success").Observe(time.Since(start).Seconds())
 			}(time.Now())
-
 			return next(ctx, request)
-
 		}
 	}
 }
